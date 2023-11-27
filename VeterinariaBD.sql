@@ -642,3 +642,31 @@ BEGIN
 	WHERE Contratos.Id = @Contrato;
 END;
 
+
+CREATE PROCEDURE movimientoVenta 
+@Id_Producto as int,
+@Id_Tipo as int,
+@CANTIDAD as int,
+@Factor as int
+AS 
+UPDATE Registros SET Cantidad =Cantidad+(@Cantidad*@Factor), Total = Total + (@Cantidad*@Factor*Precio_Unitario)
+WHERE Id_Producto = @Id_Producto AND Id_Tipo = @Id_Tipo
+
+CREATE PROCEDURE movimientoCompra
+@Id_Producto as int,
+@Id_Tipo as int,
+@Cantidad as int,
+@Total as decimal,
+@Factor as int
+AS 
+UPDATE Registros SET Cantidad =Cantidad+(@Cantidad*@Factor), Total = Total + @Total, Precio_Unitario =  (Total + @Total)/(Cantidad+(@Cantidad*@Factor))
+WHERE Id_Producto = @Id_Producto AND Id_Tipo = @Id_Tipo
+
+CREATE PROCEDURE precioProducto
+@Id_Producto as int,
+@precio as decimal
+AS 
+UPDATE Productos SET Precio =@precio
+WHERE Id = @Id_Producto 
+
+
