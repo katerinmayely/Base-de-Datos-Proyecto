@@ -8,7 +8,6 @@ GO
 CREATE TABLE Empresas(
 Id INT PRIMARY KEY IDENTITY(1,1),
 RTN VARCHAR(14) UNIQUE NOT NULL,
-CAI VARCHAR(14) NOT NULL,
 Nombre VARCHAR(100) UNIQUE NOT NULL,
 Correo_1 VARCHAR(100) NOT NULL,
 Correo_2 VARCHAR(100),
@@ -93,6 +92,22 @@ GO
 CREATE TABLE Formas_Farmaceuticas(
 Id INT PRIMARY KEY IDENTITY(1,1),
 Nombre VARCHAR(50) UNIQUE NOT NULL,
+);
+GO
+
+CREATE TABLE Farmacias(
+Id INT PRIMARY KEY IDENTITY(1,1),
+x VARCHAR (3)
+);
+GO
+
+CREATE TABLE Productos(
+Id INT PRIMARY KEY IDENTITY(1,1),
+Nombre VARCHAR(50) UNIQUE NOT NULL,
+Vencimiento DATE NOT NULL,
+Precio DECIMAL(10,2) NOT NULL,
+Id_Forma INT REFERENCES Formas_Farmaceuticas(Id),
+Id_Farmacia INT REFERENCES Farmacias(Id)
 );
 GO
 
@@ -321,21 +336,7 @@ Id_Expediente INT REFERENCES Expedientes(Id)
 );
 GO
 
-CREATE TABLE Farmacias(
-Id INT PRIMARY KEY IDENTITY(1,1),
-Id_Encargado INT REFERENCES Empleados(Id)
-);
-GO
 
-CREATE TABLE Productos(
-Id INT PRIMARY KEY IDENTITY(1,1),
-Nombre VARCHAR(50) UNIQUE NOT NULL,
-Vencimiento DATE NOT NULL,
-Precio DECIMAL(10,2) NOT NULL,
-Id_Forma INT REFERENCES Formas_Farmaceuticas(Id),
-Id_Farmacia INT REFERENCES Farmacias(Id)
-);
-GO
 
 CREATE TABLE Carnet_Vacunas(
 Id INT PRIMARY KEY IDENTITY(1,1),
@@ -390,7 +391,7 @@ GO
 
 CREATE TABLE Politicas(
 Id INT PRIMARY KEY IDENTITY(1,1),
-Descripcion VARCHAR(500)
+Descripcion VARCHAR(500) UNIQUE
 );
 GO
 
@@ -434,8 +435,7 @@ Final_Rango INT NOT NULL,
 Num_Actual INT,
 Activo BIT DEFAULT 1,
 Id_Sucursal INT REFERENCES Sucursales(Id),
-Id_Documento INT REFERENCES Tipo_Documentos(Id),
-Id_Punto_Emision INT REFERENCES Punto_Emision(Id)
+Id_Documento INT REFERENCES Tipo_Documentos(Id)
 );
 GO
 
@@ -502,9 +502,15 @@ INSERT INTO Vacunas_Aplicadas values (1, 1, GETDATE());
 INSERT INTO Enfermedades values('Alergia');
 INSERT INTO Enfermedades_Bases values (1, 1);
 
---RRHH INSERTS
---INSERTS
 
+--INSERTS
+--EMPRESA
+INSERT INTO Empresas VALUES ('08012023000001', 'Veterinaria Los Ingenieros', 'losinges@gmail.com', 'ingesvet@gmail.com', 'logo.png'); 
+
+--Sucursales
+INSERT INTO Estados_Sucursal VALUES ('Abierto'), ('Cerrado'),  ('En mantenimiento');
+
+--RRHH INSERTS
 INSERT INTO Departamentos (Nombre)
 VALUES
   ('Cort�s'),
