@@ -263,15 +263,6 @@ CONSTRAINT UQ_Contratos_Beneficios UNIQUE (Id_Contrato, Id_Beneficio),
 );
 GO
 
-CREATE TABLE Empleados(
-Id INT PRIMARY KEY IDENTITY(1,1),
-Num_Seguro VARCHAR(20) UNIQUE,
-Img VARCHAR(50),
-Id_Persona INT REFERENCES Personas(Id),
-Id_Contrato INT REFERENCES Contratos(Id)
-);
-GO
-
 CREATE TABLE Citas(
 Id INT PRIMARY KEY IDENTITY(1,1),
 Fecha DATETIME NOT NULL,
@@ -374,10 +365,20 @@ Correo VARCHAR(100) UNIQUE NOT NULL,
 Id_Empresa INT REFERENCES Empresas(Id),
 Id_Direccion INT REFERENCES Direcciones(Id),
 Id_Estado INT REFERENCES Estados_Sucursal(Id),
-Id_Farmacia INT REFERENCES Farmacias(Id),
-Id_Gerente INT REFERENCES Empleados(Id)
+Id_Farmacia INT REFERENCES Farmacias(Id)
 );
 GO
+
+CREATE TABLE Empleados(
+Id INT PRIMARY KEY IDENTITY(1,1),
+Num_Seguro VARCHAR(20) UNIQUE,
+Img VARCHAR(50),
+Id_Persona INT REFERENCES Personas(Id),
+Id_Contrato INT REFERENCES Contratos(Id) UNIQUE NOT NULL,
+Id_Sucursal INT REFERENCES Sucursales(Id) NOT NULL
+);
+GO
+
 
 CREATE TABLE Telefonos_Sucursales(
 Id INT PRIMARY KEY IDENTITY(1,1),
