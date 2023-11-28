@@ -665,3 +665,115 @@ CREATE PROCEDURE precioProducto
 AS 
 UPDATE Productos SET Precio =@precio
 WHERE Id = @Id_Producto 
+
+
+/*Desde donde trabaje Harold*/
+/*Tablas que faltabas para crear las citas*/
+CREATE TABLE Tipo_Estados(
+Id INT PRIMARY KEY IDENTITY(1,1),
+Nombre VARCHAR(50) UNIQUE NOT NULL
+);
+GO
+
+CREATE TABLE Estados_Citas(
+Id INT PRIMARY KEY IDENTITY(1,1),
+FechaInicio VARCHAR(19) CHECK (FechaInicio LIKE '[0-9][0-9][0-9][0-9]/[0-1][0-9]/[0-3][0-9] [0-2][0-9]:[0-5][0-9]:[0-5][0-9]') NOT NULL,
+FechaFinal VARCHAR(19) CHECK (FechaFinal LIKE '[0-9][0-9][0-9][0-9]/[0-1][0-9]/[0-3][0-9] [0-2][0-9]:[0-5][0-9]:[0-5][0-9]') NOT NULL,
+Id_Cita INT REFERENCES Citas(Id),
+Id_Tipo_Estado INT REFERENCES Tipo_Estados(Id)
+);
+GO
+
+INSERT INTO Tipo_Estados VALUES
+('Pendiente'),
+('Confirmada'),
+('Cancelada'),
+('Realizada'),
+('Reprogramada')
+GO
+
+
+/*Select para obtener el nombre del empleado*/
+select Personas.Primer_Nombre as Nombre from Personas
+INNER JOIN Empleados
+ON Personas.Id = Empleados.Id_Persona
+GO
+
+select Empleados.id as ID from Empleados
+Inner Join Personas
+on Empleados.Id_Persona = Personas.Id
+GO
+
+
+
+/*Select para mostrar en el datGreedView las Citas*/
+CREATE PROCEDURE ObtenerDatosCitas
+AS
+BEGIN
+    SELECT
+        est.Id AS 'ID',
+        pe.Primer_Nombre AS 'Nombre del Empleado',
+		ci.Fecha,
+        ma.Nombre AS 'Nombre de la Mascota',
+        ti.Nombre AS 'Estado',
+        est.FechaInicio AS 'Fecha Inicial del Estado',
+        est.FechaFinal AS 'Fecha Final del Estado'
+    FROM
+        Estados_Citas est
+    INNER JOIN Tipo_estados ti ON est.Id_Tipo_Estado = ti.Id
+    INNER JOIN Citas ci ON ci.Id = est.Id_Cita
+    INNER JOIN Mascotas ma ON ma.Id = ci.Id_Mascota
+    INNER JOIN Empleados em ON em.Id = ci.Id_Empleado
+    INNER JOIN Personas pe ON pe.Id = em.Id_Persona
+END;
+GO
+
+EXEC ObtenerDatosCitas;
+GO
+
+select * from Tipo_Estados;
+select * from Citas;
+Select * from Estados_Citas;
+GO
+
+
+/*Inserts de los roles de los usuarios*/
+insert into Roles Values ('Administrador');
+insert into Roles Values ('Usuario Normal');
+
+/*Tabla modificada de Usuarios*/
+CREATE TABLE Usuarios(
+Id INT PRIMARY KEY IDENTITY(1,1),
+Usuario VARCHAR(25) UNIQUE NOT NULL,
+Contrasenia VARCHAR(50) NOT NULL,
+Activo BIT DEFAULT 0,
+Id_Empleado INT REFERENCES Empleados(Id),
+Id_Roles INT REFERENCES Roles(Id)
+);
+GO
+
+/*Procedimiento almacenado para ver los datos de los usuarios*/
+CREATE PROCEDURE ObtenerDatosUsuarios
+AS
+BEGIN
+	SELECT 
+		us.Id, us.Usuario, 
+		us.Contrasenia 'Contraseña', 
+		us.Activo, ro.Nombre as 'Rol del Usuario', 
+		pe.DNI as 'DNI de la persona',
+		pe.Primer_Nombre + ' '+ pe.Primer_Apellido as 'Nombre del Empleado'
+	FROM 
+		Usuarios us
+	INNER JOIN Roles ro ON ro.Id = us.Id_Roles
+	INNER JOIN Empleados em ON em.Id = us.Id_Empleado
+	INNER JOIN Personas pe ON pe.Id = em.Id_Persona
+END;
+
+EXEC ObtenerDatosUsuarios;
+
+
+/*Select para obtener el dni*/
+SELECT em.Id FROM Empleados em
+INNER JOIN Personas pe
+ON pe.Id = em.Id_Persona
+where pe.DNI = pe.DNI;
