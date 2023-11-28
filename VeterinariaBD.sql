@@ -207,7 +207,7 @@ Id INT PRIMARY KEY IDENTITY(1,1),
 Primer_Nombre VARCHAR(50) NOT NULL,
 Segundo_Nombre VARCHAR(50),
 Primer_Apellido VARCHAR(50) NOT NULL,
-Segundo_Apelldio VARCHAR(50),
+Segundo_Apellido VARCHAR(50),
 DNI VARCHAR(13) UNIQUE NOT NULL,
 FechaNac DATE NOT NULL,
 
@@ -572,17 +572,8 @@ INSERT INTO Periodos_Pago (Periodo) VALUES
 ('Mensual'), ('Quincenal');
 GO
 
-INSERT INTO Salarios (Salario_Bruto, Id_Periodo_Pago) VALUES (1000000.00, 1);
-INSERT INTO Salarios (Salario_Bruto, Id_Periodo_Pago) VALUES (500000.00, 1);
-INSERT INTO Salarios (Salario_Bruto, Id_Periodo_Pago) VALUES (30000.00, 1);
-INSERT INTO Salarios (Salario_Bruto, Id_Periodo_Pago) VALUES (400000.00, 1);
-INSERT INTO Salarios (Salario_Bruto, Id_Periodo_Pago) VALUES (400000.00, 1);
-INSERT INTO Salarios (Salario_Bruto, Id_Periodo_Pago) VALUES (30000.00, 1);
-INSERT INTO Salarios (Salario_Bruto, Id_Periodo_Pago) VALUES (400000.00, 1);
-INSERT INTO Salarios (Salario_Bruto, Id_Periodo_Pago) VALUES (400000.00, 1);
-INSERT INTO Salarios (Salario_Bruto, Id_Periodo_Pago) VALUES (400000.00, 2);
+INSERT INTO Periodos_Laborales VALUES ('Fin de Semana'), ('De Lunes a Viernes');
 
-INSERT INTO Periodos_Laborales(Periodo_Laboral) VALUES ('De Lunes a Viernes'), ('Fin de Semana');
 
 INSERT INTO Contratos (Fecha_Inicio, Fecha_Final, Id_Periodo_Laboral, Id_Horario, Id_Tipo, Id_Salario) VALUES
 						(GETDATE(), '2024-06-01', 1, 1, 8, 11),
@@ -599,6 +590,11 @@ INSERT INTO Contratos_Deducciones (Id_Contrato, Id_Deduccion) VALUES
 
 INSERT INTO Contratos_Deducciones (Id_Contrato, Id_Deduccion) VALUES
 						(9, 2)
+
+INSERT INTO Direcciones VALUES ('Por Metropoli', 2);
+
+INSERT INTO Sucursales VALUES ('0987', 'Los Ingenieros', 'losinges@gmail.com', 1, 2, 1, 1);
+
 
 --TRIGGERS
 CREATE TRIGGER SetSalarioNeto
