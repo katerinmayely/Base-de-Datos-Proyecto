@@ -288,7 +288,7 @@ GO
 
 CREATE TABLE Sucursales(
 Id INT PRIMARY KEY IDENTITY(1,1),
-Codigo VARCHAR(10) UNIQUE NOT NULL,
+Codigo VARCHAR(3) UNIQUE NOT NULL,
 Nombre VARCHAR(100) UNIQUE NOT NULL,
 Correo VARCHAR(100) UNIQUE NOT NULL,
 Id_Empresa INT REFERENCES Empresas(Id),
@@ -329,8 +329,6 @@ Id_Tipo INT REFERENCES Tipo_Consulta(Id),
 Id_Expediente INT REFERENCES Expedientes(Id)
 );
 GO
-
-
 
 CREATE TABLE Carnet_Vacunas(
 Id INT PRIMARY KEY IDENTITY(1,1),
@@ -416,8 +414,11 @@ GO
 
 CREATE TABLE Punto_Emision(
 Id INT PRIMARY KEY IDENTITY(1,1),
-Codigo VARCHAR(20) UNIQUE NOT NULL,
-Id_Sucursal INT REFERENCES Sucursales(Id)
+Codigo VARCHAR(3) NOT NULL,
+id_Ultima_Factura_Emitida INT NOT NULL DEFAULT 0,
+Id_Sucursal INT REFERENCES Sucursales(Id),
+
+CONSTRAINT UQ_Punto_Codigo UNIQUE (Codigo, Id_Sucursal)
 );
 GO
 
@@ -436,9 +437,9 @@ GO
 
 CREATE TABLE Facturas(
 Id INT PRIMARY KEY IDENTITY(1,1),
-Num_Factura INT UNIQUE NOT NULL,
+RTN_Cliente VARCHAR(15),
+Num_Factura VARCHAR(19) UNIQUE,
 Fecha DATE NOT NULL,
-Precio_Consulta DECIMAL(10,2) NOT NULL, 
 Total DECIMAL(10,2) NOT NULL,
 Impuesto_15 DECIMAL(10,2),
 Impuesto_18 DECIMAL(10,2),
@@ -468,22 +469,6 @@ GO
 
 
 --INSERTS
-
---SAR
-INSERT INTO Tipo_Documentos VALUES ('Factura', '01'), ('Boleta de Venta', '02'), ('Recibo de Alquiler', '03'), ('Recibo por Honorarios', '04'), ('Nota de Crédito', '05'), ('Nota de Débito', '06'), ('Comprobante de Retencion', '07'), ('Boleta de Compra', '08');
-GO
-
---FARMACIAS
-INSERT INTO Farmacias VALUES ('001'), ('002'), ('003'), ('004');
-GO
-
---SUCURSALES
-INSERT INTO Sucursales VALUES ('1234', 'Sucursal 1', 'losinges01@gmail.com', 1, 1, 1, 1),
-							  ('5678', 'Sucursal 2', 'losinges02@gmail.com', 1, 2, 1, 2),
-							  ('9876', 'Sucursal 3', 'losinges03@gmail.com', 1, 3, 1, 3),
-							  ('5432', 'Sucursal 4', 'losinges04@gmail.com', 1, 4, 1, 4);
-GO
-
 --MASCOTAS INSERTS
 
 INSERT INTO Expedientes VALUES (GETDATE(), 1);
@@ -584,6 +569,31 @@ INSERT INTO Periodos_Pago (Periodo) VALUES
 GO
 
 INSERT INTO Periodos_Laborales VALUES ('Fin de Semana'), ('De Lunes a Viernes');
+
+--SAR
+INSERT INTO Tipo_Documentos VALUES ('Factura', '01'), ('Boleta de Venta', '02'), ('Recibo de Alquiler', '03'), ('Recibo por Honorarios', '04'), ('Nota de Crédito', '05'), ('Nota de Débito', '06'), ('Comprobante de Retencion', '07'), ('Boleta de Compra', '08');
+GO
+
+--FARMACIAS
+INSERT INTO Farmacias VALUES ('001'), ('002'), ('003'), ('004');
+GO
+
+--SUCURSALES
+INSERT INTO Sucursales VALUES ('1234', 'Sucursal 1', 'losinges01@gmail.com', 1, 1, 1, 1),
+							  ('5678', 'Sucursal 2', 'losinges02@gmail.com', 1, 2, 1, 2),
+							  ('9876', 'Sucursal 3', 'losinges03@gmail.com', 1, 3, 1, 3),
+							  ('5432', 'Sucursal 4', 'losinges04@gmail.com', 1, 4, 1, 4);
+GO
+
+
+--INSCRIPCION SAR
+INSERT INTO Inscripcion_SAR VALUES ('123DFA-ABC5BC-ABC123-FD12AB-ABC567-12', '2024-12-31', 1, 1500, 0, 1, 1, 1);
+INSERT INTO Inscripcion_SAR VALUES ('123DFB-ABC5BC-ABC123-FD12AB-ABC567-12', '2024-12-31', 1, 1500, 0, 1, 2, 1);
+INSERT INTO Inscripcion_SAR VALUES ('123DFC-ABC5BC-ABC123-FD12AB-ABC567-12', '2024-12-31', 1, 1500, 0, 1, 3, 1);
+INSERT INTO Inscripcion_SAR VALUES ('123DFD-ABC5BC-ABC123-FD12AB-ABC567-12', '2024-12-31', 1, 1500, 0, 1, 4, 1);
+
+--PUNTOS EMISION
+INSERT INTO Punto_Emision VALUES ('001', 0, 1), ('002', 0, 1), ('001', 0, 2), ('002', 0, 2), ('001', 0, 3), ('002', 0, 3), ('001', 0, 4), ('002', 0, 4);
 
 
 --TRIGGERS
