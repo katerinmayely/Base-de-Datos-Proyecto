@@ -1,9 +1,9 @@
-CREATE DATABASE Veterinaria;
+CREATE DATABASE Veterinarias;
 GO
-USE Veterinaria;
+USE Veterinarias;
 GO
  --USE master
- --DROP DATABASE Veterinaria
+--DROP DATABASE Veterinarias
  
 CREATE TABLE Empresas(
 Id INT PRIMARY KEY IDENTITY(1,1),
@@ -80,12 +80,6 @@ CREATE TABLE Tipo_Consulta(
 Id INT PRIMARY KEY IDENTITY(1,1),
 Nombre VARCHAR(50) UNIQUE NOT NULL,
 Descripcion VARCHAR(200) 
-);
-GO
-
-CREATE TABLE Recetas(
-Id INT PRIMARY KEY IDENTITY(1,1),
-Dosis VARCHAR(10) NOT NULL
 );
 GO
 
@@ -241,7 +235,7 @@ GO
 CREATE TABLE Responsables_Mascotas(
 Id INT PRIMARY KEY IDENTITY(1,1),
 Id_Persona INT REFERENCES Personas(Id),
-Id_Mascota INT REFERENCES Mascotas(Id)
+Id_Mascota INT REFERENCES Mascotas(Id),
 CONSTRAINT UQ_Res_Mascotas UNIQUE (Id_Persona, Id_Mascota),
 );
 GO
@@ -330,7 +324,6 @@ Diagnostico VARCHAR(200),
 Id_Cita INT REFERENCES Citas(Id),
 Id_Medico INT REFERENCES Empleados(Id),
 Id_Persona_Ingreso INT REFERENCES Responsables_Mascotas(Id),
-Id_Receta INT REFERENCES Recetas(Id),
 Id_Tipo INT REFERENCES Tipo_Consulta(Id),
 Id_Expediente INT REFERENCES Expedientes(Id)
 );
@@ -378,7 +371,8 @@ CREATE TABLE Recetas_Medicamentos(
 Id INT PRIMARY KEY IDENTITY(1,1),
 Descripcion VARCHAR(200),
 Id_Productos INT REFERENCES Productos(Id),
-Id_Receta INT REFERENCES Recetas(Id)
+Dosis VARCHAR(10) NOT NULL,
+Id_Consulta INT REFERENCES Consultas(Id)
 );
 GO
 
