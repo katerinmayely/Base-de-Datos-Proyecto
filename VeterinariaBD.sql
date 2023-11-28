@@ -1,9 +1,9 @@
-CREATE DATABASE Veterinarias;
+CREATE DATABASE Veterinaria;
 GO
-USE Veterinarias;
+USE Veterinaria;
 GO
  --USE master
---DROP DATABASE Veterinarias
+--DROP DATABASE Veterinaria
  
 CREATE TABLE Empresas(
 Id INT PRIMARY KEY IDENTITY(1,1),
@@ -91,7 +91,7 @@ GO
 
 CREATE TABLE Farmacias(
 Id INT PRIMARY KEY IDENTITY(1,1),
-x VARCHAR (3)
+codigo VARCHAR(3) UNIQUE
 );
 GO
 
@@ -115,6 +115,7 @@ GO
 CREATE TABLE Tipo_Documentos(
 Id INT PRIMARY KEY IDENTITY(1,1),
 Tipo VARCHAR(50) UNIQUE NOT NULL,
+Codigo VARCHAR(2) UNIQUE NOT NULL
 );
 GO
 
@@ -422,14 +423,14 @@ GO
 
 CREATE TABLE Inscripcion_SAR(
 Id INT PRIMARY KEY IDENTITY(1,1),
-CAI VARCHAR(14),
+CAI VARCHAR(32) NOT NULL,
 Fecha_Limite DATE NOT NULL,
 Inicio_Rango INT NOT NULL,
 Final_Rango INT NOT NULL,
 Num_Actual INT,
 Activo BIT DEFAULT 1,
-Id_Sucursal INT REFERENCES Sucursales(Id),
-Id_Documento INT REFERENCES Tipo_Documentos(Id)
+Id_Sucursal INT REFERENCES Sucursales(Id) NOT NULL,
+Id_Documento INT REFERENCES Tipo_Documentos(Id) NOT NULL
 );
 GO
 
@@ -468,6 +469,21 @@ GO
 
 --INSERTS
 
+--SAR
+INSERT INTO Tipo_Documentos VALUES ('Factura', '01'), ('Boleta de Venta', '02'), ('Recibo de Alquiler', '03'), ('Recibo por Honorarios', '04'), ('Nota de Crédito', '05'), ('Nota de Débito', '06'), ('Comprobante de Retencion', '07'), ('Boleta de Compra', '08');
+GO
+
+--FARMACIAS
+INSERT INTO Farmacias VALUES ('001'), ('002'), ('003'), ('004');
+GO
+
+--SUCURSALES
+INSERT INTO Sucursales VALUES ('1234', 'Sucursal 1', 'losinges01@gmail.com', 1, 1, 1, 1),
+							  ('5678', 'Sucursal 2', 'losinges02@gmail.com', 1, 2, 1, 2),
+							  ('9876', 'Sucursal 3', 'losinges03@gmail.com', 1, 3, 1, 3),
+							  ('5432', 'Sucursal 4', 'losinges04@gmail.com', 1, 4, 1, 4);
+GO
+
 --MASCOTAS INSERTS
 
 INSERT INTO Expedientes VALUES (GETDATE(), 1);
@@ -487,7 +503,6 @@ INSERT INTO Mascotas values('Eduardo', 'gris con negro', '2022-08-09', 0, 0, '8.
 GO
 INSERT INTO Personas (Primer_Nombre, Primer_Apellido, DNI, FechaNac) VALUES ('Kelin', 'Aguilar', '0801198400000', '2002-03-08');
 INSERT INTO Responsables_Mascotas values (2,9);
-INSERT INTO Farmacias values(NULL);
 INSERT INTO Formas_Farmaceuticas values ('Jarabe'),('Pastilla'),('Vacuna');
 INSERT INTO Productos values ('NOBIVAC', '2023-08-09', 150.50, 3, 1);
 INSERT INTO Productos values ('COVID', '2023-08-09', 150.50, 3, 1);
@@ -500,23 +515,25 @@ INSERT INTO Enfermedades_Bases values (1, 1);
 --INSERTS
 --EMPRESA
 INSERT INTO Empresas VALUES ('08012023000001', 'Veterinaria Los Ingenieros', 'losinges@gmail.com', 'ingesvet@gmail.com', 'logo.png'); 
+GO
 
 --Sucursales
 INSERT INTO Estados_Sucursal VALUES ('Abierto'), ('Cerrado'),  ('En mantenimiento');
+GO
 
 --RRHH INSERTS
 INSERT INTO Departamentos (Nombre)
 VALUES
-  ('Cort�s'),
-  ('Islas de la Bah�a'),
-  ('Atl�ntida'),
+  ('Cortés'),
+  ('Islas de la Bahía'),
+  ('Atlántida'),
   ('Distrito Central');
 GO
 
 INSERT INTO Ciudades (Nombre, Id_Departamento)
 VALUES
   ('San Pedro Sula', 1),
-  ('Roat�n', 2),
+  ('Roatán', 2),
   ('La Ceiba', 3),
   ('Tegucigalpa', 4);
 GO
@@ -567,27 +584,6 @@ INSERT INTO Periodos_Pago (Periodo) VALUES
 GO
 
 INSERT INTO Periodos_Laborales VALUES ('Fin de Semana'), ('De Lunes a Viernes');
-
-
-INSERT INTO Contratos (Fecha_Inicio, Fecha_Final, Id_Periodo_Laboral, Id_Horario, Id_Tipo, Id_Salario) VALUES
-						(GETDATE(), '2024-06-01', 1, 1, 8, 11),
-						(GETDATE(), '2024-04-01', 1, 2, 1, 10)
-
-						
-INSERT INTO Contratos (Fecha_Inicio, Fecha_Final, Id_Periodo_Laboral, Id_Horario, Id_Tipo, Id_Salario) VALUES
-						(GETDATE(), '2024-06-01', 1, 1, 8, 1),
-						(GETDATE(), '2024-04-01', 1, 2, 1, 2)
-
-INSERT INTO Contratos_Deducciones (Id_Contrato, Id_Deduccion) VALUES
-						(8, 2),
-						(9, 1)
-
-INSERT INTO Contratos_Deducciones (Id_Contrato, Id_Deduccion) VALUES
-						(9, 2)
-
-INSERT INTO Direcciones VALUES ('Por Metropoli', 2);
-
-INSERT INTO Sucursales VALUES ('0987', 'Los Ingenieros', 'losinges@gmail.com', 1, 2, 1, 1);
 
 
 --TRIGGERS
