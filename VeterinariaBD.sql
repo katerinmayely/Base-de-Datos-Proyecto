@@ -721,3 +721,23 @@ CREATE PROCEDURE precioProducto
 AS 
 UPDATE Productos SET Precio =@precio
 WHERE Id = @Id_Producto 
+
+
+BEGIN TRY	
+	BEGIN TRAN 
+	INSERT INTO Farmacias(codigo) 
+	VALUES (NULL); 
+	DECLARE @Id_Farmacia AS INT SET @Id_Farmacia = (SELECT IDENT_CURRENT('Farmacias') AS Id);
+	
+	INSERT INTO Direcciones(Referencia, Id_Ciudad) VALUES ('Col. Sauce', 4); 
+	DECLARE @Id_Direccion AS INT SET @Id_Direccion = (SELECT IDENT_CURRENT('Direcciones') AS Id); 
+
+	INSERT INTO Sucursales(Codigo, Nombre, Correo, Id_Empresa, Id_Direccion, Id_Estado, Id_Farmacia) 
+	VALUES ('098767', 'Sucursal5', 'sucursal5@gmail.com', 1, @Id_Direccion, 1, @Id_Farmacia); 	
+	COMMIT 	
+	PRINT('SE INSERTO LA SUCURSAL'); 
+END TRY 
+BEGIN CATCH 
+	ROLLBACK 
+	PRINT('NO SE INSERTO LA SUCURSAL'); 
+END CATCH
