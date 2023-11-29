@@ -241,8 +241,6 @@ CONSTRAINT UQ_Res_Mascotas UNIQUE (Id_Persona, Id_Mascota),
 );
 GO
 
---SELECT Personas.Primer_Nombre AS Nombre, Personas.Primer_Apellido AS Apellido, Personas.DNI AS Dni FROM Mascotas  JOIN Responsables_Mascotas ON Mascotas.Id = Responsables_Mascotas.Id_Mascota JOIN Personas ON Responsables_Mascotas.Id_Persona = Personas.Id WHERE Mascotas.Id =  2 
-
 CREATE TABLE Contratos(
 Id INT PRIMARY KEY IDENTITY(1,1),
 Fecha_Inicio DATE NOT NULL,
@@ -412,10 +410,10 @@ Id_Permiso INT REFERENCES Permisos(Id)
 );
 GO
 
-CREATE TABLE Punto_Emision(
+CREATE TABLE Puntos_Emision(
 Id INT PRIMARY KEY IDENTITY(1,1),
 Codigo VARCHAR(3) NOT NULL,
-id_Ultima_Factura_Emitida INT NOT NULL DEFAULT 0,
+Id_Ultima_Factura_Emitida INT NOT NULL DEFAULT 0,
 Id_Sucursal INT REFERENCES Sucursales(Id),
 
 CONSTRAINT UQ_Punto_Codigo UNIQUE (Codigo, Id_Sucursal)
@@ -444,8 +442,9 @@ Total DECIMAL(10,2) NOT NULL,
 Impuesto_15 DECIMAL(10,2),
 Impuesto_18 DECIMAL(10,2),
 Id_Inscripcion INT REFERENCES Inscripcion_SAR(Id),
-Id_Scursal INT REFERENCES Sucursales(Id),
-Id_Cliente INT REFERENCES Responsables_Mascotas(Id)
+Id_Scursal INT REFERENCES Sucursales(Id) NOT NULL,
+Id_Cliente INT REFERENCES Responsables_Mascotas(Id) NOT NULL,
+Id_Tipo_Documento INT REFERENCES Tipo_Documentos(Id) NOT NULL
 ); 
 GO
 
@@ -568,36 +567,100 @@ INSERT INTO Inscripcion_SAR VALUES ('123DFD-ABC5BC-ABC123-FD12AB-ABC567-12', '20
 GO
 
 --PUNTOS EMISION
-INSERT INTO Punto_Emision VALUES ('001', 0, 1), ('002', 0, 1), ('001', 0, 2), ('002', 0, 2), ('001', 0, 3), ('002', 0, 3), ('001', 0, 4), ('002', 0, 4);
+INSERT INTO Puntos_Emision VALUES ('001', 0, 1), ('002', 0, 1), ('001', 0, 2), ('002', 0, 2), ('001', 0, 3), ('002', 0, 3), ('001', 0, 4), ('002', 0, 4);
 GO
 
 --MASCOTAS INSERTS
 INSERT INTO Expedientes VALUES (GETDATE(), 1);
+GO 
+
 INSERT INTO Consultas values('2023-08-09', '12:30:00', 'gripe', '2 acetaminofen y piola', null, null, 1, null, null, 1);
-go
+GO
+
 INSERT INTO Especies values ('Conejo'),('Perro'), ('Gato'), ('Hamster');
 GO
+
 INSERT INTO Razas values('Bulldog', 2),('Beagle', 2),('Esfinge', 3),('Caracal', 3);
 GO
+
 INSERT INTO Razas (Nombre) values('No definido');
 GO
+
 INSERT INTO Generos VALUES ('Macho'),('Hembra'),('No identificado');
 GO
+
 INSERT INTO Estados VALUES ('Sano'),('Enfermo'),('Recuperacion');
 GO
-INSERT INTO Mascotas values('Eduardo', 'gris con negro', '2022-08-09', 0, 0, '8.8', '27', 3, 4, 1, 1);
-GO
+
 INSERT INTO Personas (Primer_Nombre, Primer_Apellido, DNI, FechaNac) VALUES ('Kelin', 'Aguilar', '0801198400000', '2002-03-08');
-INSERT INTO Responsables_Mascotas values (2,9);
+GO
+
 INSERT INTO Formas_Farmaceuticas values ('Jarabe'),('Pastilla'),('Vacuna');
+GO
+
 INSERT INTO Productos values ('NOBIVAC', '2023-08-09', 150.50, 3, 1);
+GO
+
 INSERT INTO Productos values ('COVID', '2023-08-09', 150.50, 3, 1);
+GO
+
 INSERT INTO Carnet_Vacunas VALUES(GETDATE(), 1, NULL);
+GO
+
 INSERT INTO Vacunas_Aplicadas values (1, 1, GETDATE());
+GO
+
 INSERT INTO Enfermedades values('Alergia');
+GO
+
 INSERT INTO Enfermedades_Bases values (1, 1);
+GO
 
 --TRIGGERS
+CREATE TRIGGER GenerarNumeroFactura 
+ON Facturas
+AFTER INSERT AS
+BEGIN 
+	DECLARE @Id_Sucursal AS INT = (SELECT Id_Scursal FROM inserted);
+
+	--Obtengo el numero correlativo de factura actual
+	DECLARE @Num_Actual AS INT = (SELECT Num_Actual 
+								  FROM Inscripcion_SAR 
+								  WHERE Id_Sucursal = @Id_Sucursal AND Activo = 1);
+	
+	--Numero correlativo de la nueva factura
+	UPDATE Inscripcion_SAR 
+	SET Activo = @Num_Actual + 1
+	WHERE Id_Sucursal = @Id_Sucursal AND Activo = 1
+
+	--Obtengo el correlativo de la nueva factura
+	DECLARE @Nuevo_Correlativo AS INT = (SELECT Num_Actual 
+								  FROM Inscripcion_SAR 
+								  WHERE Id_Sucursal = @Id_Sucursal AND Activo = 1);
+
+	DECLARE @Id_Factura_Ingresada AS INT = (SELECT Id FROM inserted)
+
+	DECLARE @Punto_Emision AS VARCHAR(3) = (SELECT Puntos_Emision.Codigo
+											FROM (Puntos_Emision JOIN Sucursales ON Puntos_Emision.Id_Sucursal = @Id_Sucursal)
+											WHERE Puntos_Emision.Id_Ultima_Factura_Ingresada = @Id_Factura_Ingresada)
+	DECLARE @Codigo_Sucursal AS VARCHAR(3) = (SELECT Sucursales.Codigo 
+											  FROM Sucursales 
+											  WHERE Id = @Id_Sucursal)
+	DECLARE @Tipo_Documento AS VARCHAR(2) = (SELECT Tipo_Documentos.Codigo 
+										     FROM (Tipo_Documentos INNER JOIN Facturas ON Tipo_Documentos.Id = Facturas.Id_Tipo_Documento)
+											 WHERE Facturas.Id = @Id_Factura_Ingresada)
+
+	DECLARE @Nuevo_Correlativo_Formateado VARCHAR(8);
+	SET @Nuevo_Correlativo_Formateado = FORMAT(@Nuevo_Correlativo, '00000000');
+
+	DECLARE @Numero_Factura AS VARCHAR(19) = @Codigo_Sucursal + '-' + @Punto_Emision + '-' + @Tipo_Documento + '-' + @Nuevo_Correlativo_Formateado;
+
+	UPDATE Facturas
+    SET Num_Factura = @Numero_Factura
+    FROM Facturas INNER JOIN inserted ON Facturas.Id = inserted.Id;
+END
+GO
+
 CREATE TRIGGER SetSalarioNeto
 ON Salarios
 AFTER INSERT
@@ -610,7 +673,7 @@ BEGIN
     FROM Salarios
     INNER JOIN inserted ON Salarios.Id = inserted.Id;
 END;
-
+GO
 
 CREATE TRIGGER ActualizarSalarioNeto
 ON Contratos_Deducciones
@@ -628,6 +691,7 @@ BEGIN
     INNER JOIN Contratos ON Salarios.Id = Contratos.Id_Salario
 	WHERE Contratos.Id = @Contrato;
 END;
+GO
 
 CREATE TRIGGER ActualizarSalarioNeto2
 ON Contratos_Deducciones
@@ -645,7 +709,7 @@ BEGIN
     INNER JOIN Contratos ON Salarios.Id = Contratos.Id_Salario
 	WHERE Contratos.Id = @Contrato;
 END;
-
+GO
 
 CREATE PROCEDURE movimientoVenta 
 @Id_Producto as int,
@@ -655,6 +719,7 @@ CREATE PROCEDURE movimientoVenta
 AS 
 UPDATE Registros SET Cantidad =Cantidad+(@Cantidad*@Factor), Total = Total + (@Cantidad*@Factor*Precio_Unitario)
 WHERE Id_Producto = @Id_Producto AND Id_Tipo = @Id_Tipo
+GO
 
 CREATE PROCEDURE movimientoCompra
 @Id_Producto as int,
@@ -665,6 +730,7 @@ CREATE PROCEDURE movimientoCompra
 AS 
 UPDATE Registros SET Cantidad =Cantidad+(@Cantidad*@Factor), Total = Total + @Total, Precio_Unitario =  (Total + @Total)/(Cantidad+(@Cantidad*@Factor))
 WHERE Id_Producto = @Id_Producto AND Id_Tipo = @Id_Tipo
+GO
 
 CREATE PROCEDURE precioProducto
 @Id_Producto as int,
@@ -672,7 +738,7 @@ CREATE PROCEDURE precioProducto
 AS 
 UPDATE Productos SET Precio =@precio
 WHERE Id = @Id_Producto 
-
+GO
 
 /*Desde donde trabaje Harold*/
 /*Tablas que faltabas para crear las citas*/
