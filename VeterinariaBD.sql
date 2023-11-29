@@ -2,8 +2,6 @@ CREATE DATABASE Veterinaria;
 GO
 USE Veterinaria;
 GO
---USE master
---DROP DATABASE Veterinaria
  
 CREATE TABLE Empresas(
 Id INT PRIMARY KEY IDENTITY(1,1),
@@ -393,8 +391,8 @@ GO
 
 CREATE TABLE Usuarios(
 Id INT PRIMARY KEY IDENTITY(1,1),
-Usuario VARCHAR(20) UNIQUE NOT NULL,
-Contrasenia VARCHAR(50) UNIQUE NOT NULL,
+Usuario VARCHAR(25) UNIQUE NOT NULL,
+Contrasenia VARCHAR(50) NOT NULL,
 Activo BIT DEFAULT 0,
 Id_Empleado INT REFERENCES Empleados(Id),
 Id_Roles INT REFERENCES Roles(Id)
@@ -458,6 +456,21 @@ Impuesto_15 DECIMAL(10,2),
 Impuesto_18 DECIMAL(10,2),
 Id_Factura INT REFERENCES Facturas(Id),
 Id_Producto INT REFERENCES Productos(Id)
+);
+GO
+
+CREATE TABLE Tipo_Estados(
+Id INT PRIMARY KEY IDENTITY(1,1),
+Nombre VARCHAR(50) UNIQUE NOT NULL
+);
+GO
+
+CREATE TABLE Estados_Citas(
+Id INT PRIMARY KEY IDENTITY(1,1),
+FechaInicio VARCHAR(19) CHECK (FechaInicio LIKE '[0-9][0-9][0-9][0-9]/[0-1][0-9]/[0-3][0-9] [0-2][0-9]:[0-5][0-9]:[0-5][0-9]') NOT NULL,
+FechaFinal VARCHAR(19) CHECK (FechaFinal LIKE '[0-9][0-9][0-9][0-9]/[0-1][0-9]/[0-3][0-9] [0-2][0-9]:[0-5][0-9]:[0-5][0-9]') NOT NULL,
+Id_Cita INT REFERENCES Citas(Id),
+Id_Tipo_Estado INT REFERENCES Tipo_Estados(Id)
 );
 GO
 
@@ -560,6 +573,30 @@ INSERT INTO Enfermedades values('Alergia');
 GO
 
 INSERT INTO Enfermedades_Bases values (1, 1);
+GO
+
+INSERT INTO Tipo_Estados VALUES
+('Pendiente'),
+('Confirmada'),
+('Cancelada'),
+('Realizada'),
+('Reprogramada')
+GO
+
+insert into Permisos Values
+('Todos')
+('Informacion de la Empresa'),
+('Sucursales'),
+('Recursos Humanos'),
+('Farmacia'),
+('Atencion al Cliente'),
+('Facturas'),
+('Usuarios del Sistema'),
+('Informacion Personal');
+GO
+
+insert into Roles Values ('Administrador');
+insert into Roles Values ('Usuario Normal');
 GO
 
 --TRIGGERS
