@@ -843,7 +843,7 @@ BEGIN
 END;
 
 EXEC ObtenerDatosUsuarios;
-
+INSERT INTO Tipos_Registros VALUES ( 'Compra',1),( 'dev Compra', -1),( 'Venta', -1),( 'dev Venta', 1),('Registro', 0);
 
 /*Select para obtener el dni*/
 SELECT em.Id FROM Empleados em
