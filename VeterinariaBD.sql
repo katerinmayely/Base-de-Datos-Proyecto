@@ -362,7 +362,6 @@ GO
 
 CREATE TABLE Recetas_Medicamentos(
 Id INT PRIMARY KEY IDENTITY(1,1),
-Descripcion VARCHAR(200),
 Id_Productos INT REFERENCES Productos(Id),
 Dosis VARCHAR(10) NOT NULL,
 Id_Consulta INT REFERENCES Consultas(Id)
