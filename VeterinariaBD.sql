@@ -2,7 +2,7 @@ CREATE DATABASE Veterinaria;
 GO
 USE Veterinaria;
 GO
- --USE master
+--USE master
 --DROP DATABASE Veterinaria
  
 CREATE TABLE Empresas(
@@ -289,10 +289,10 @@ Id INT PRIMARY KEY IDENTITY(1,1),
 Codigo VARCHAR(3) UNIQUE NOT NULL,
 Nombre VARCHAR(100) UNIQUE NOT NULL,
 Correo VARCHAR(100) UNIQUE NOT NULL,
-Id_Empresa INT REFERENCES Empresas(Id),
-Id_Direccion INT REFERENCES Direcciones(Id),
-Id_Estado INT REFERENCES Estados_Sucursal(Id),
-Id_Farmacia INT REFERENCES Farmacias(Id)
+Id_Empresa INT REFERENCES Empresas(Id) NOT NULL,
+Id_Direccion INT REFERENCES Direcciones(Id) UNIQUE NOT NULL,
+Id_Estado INT REFERENCES Estados_Sucursal(Id) NOT NULL,
+Id_Farmacia INT REFERENCES Farmacias(Id) UNIQUE NOT NULL
 );
 GO
 
