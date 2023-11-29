@@ -3,7 +3,7 @@ GO
 USE Veterinarias;
 GO
  --USE master
---DROP DATABASE Veterinarias
+--DROP DATABASE Veterinaria
  
 CREATE TABLE Empresas(
 Id INT PRIMARY KEY IDENTITY(1,1),
@@ -91,7 +91,7 @@ GO
 
 CREATE TABLE Farmacias(
 Id INT PRIMARY KEY IDENTITY(1,1),
-x VARCHAR (3)
+codigo VARCHAR(3) UNIQUE
 );
 GO
 
@@ -115,6 +115,7 @@ GO
 CREATE TABLE Tipo_Documentos(
 Id INT PRIMARY KEY IDENTITY(1,1),
 Tipo VARCHAR(50) UNIQUE NOT NULL,
+Codigo VARCHAR(2) UNIQUE NOT NULL
 );
 GO
 
@@ -287,7 +288,7 @@ GO
 
 CREATE TABLE Sucursales(
 Id INT PRIMARY KEY IDENTITY(1,1),
-Codigo VARCHAR(10) UNIQUE NOT NULL,
+Codigo VARCHAR(3) UNIQUE NOT NULL,
 Nombre VARCHAR(100) UNIQUE NOT NULL,
 Correo VARCHAR(100) UNIQUE NOT NULL,
 Id_Empresa INT REFERENCES Empresas(Id),
@@ -329,13 +330,9 @@ Id_Expediente INT REFERENCES Expedientes(Id)
 );
 GO
 
-
-
 CREATE TABLE Carnet_Vacunas(
 Id INT PRIMARY KEY IDENTITY(1,1),
-Fecha DATE NOT NULL,
-Id_Macota  INT REFERENCES Mascotas(Id),
-Proxima_Vacuna INT REFERENCES Productos(Id)
+Id_Macota  INT REFERENCES Mascotas(Id)
 );
 GO
 
@@ -415,29 +412,32 @@ GO
 
 CREATE TABLE Punto_Emision(
 Id INT PRIMARY KEY IDENTITY(1,1),
-Codigo VARCHAR(20) UNIQUE NOT NULL,
-Id_Sucursal INT REFERENCES Sucursales(Id)
+Codigo VARCHAR(3) NOT NULL,
+id_Ultima_Factura_Emitida INT NOT NULL DEFAULT 0,
+Id_Sucursal INT REFERENCES Sucursales(Id),
+
+CONSTRAINT UQ_Punto_Codigo UNIQUE (Codigo, Id_Sucursal)
 );
 GO
 
 CREATE TABLE Inscripcion_SAR(
 Id INT PRIMARY KEY IDENTITY(1,1),
-CAI VARCHAR(14),
+CAI VARCHAR(37) NOT NULL,
 Fecha_Limite DATE NOT NULL,
 Inicio_Rango INT NOT NULL,
 Final_Rango INT NOT NULL,
 Num_Actual INT,
 Activo BIT DEFAULT 1,
-Id_Sucursal INT REFERENCES Sucursales(Id),
-Id_Documento INT REFERENCES Tipo_Documentos(Id)
+Id_Sucursal INT REFERENCES Sucursales(Id) NOT NULL,
+Id_Documento INT REFERENCES Tipo_Documentos(Id) NOT NULL
 );
 GO
 
 CREATE TABLE Facturas(
 Id INT PRIMARY KEY IDENTITY(1,1),
-Num_Factura INT UNIQUE NOT NULL,
+RTN_Cliente VARCHAR(15),
+Num_Factura VARCHAR(19) UNIQUE,
 Fecha DATE NOT NULL,
-Precio_Consulta DECIMAL(10,2) NOT NULL, 
 Total DECIMAL(10,2) NOT NULL,
 Impuesto_15 DECIMAL(10,2),
 Impuesto_18 DECIMAL(10,2),
@@ -467,56 +467,27 @@ GO
 
 
 --INSERTS
-
---MASCOTAS INSERTS
-
-INSERT INTO Expedientes VALUES (GETDATE(), 1);
-INSERT INTO Consultas values('2023-08-09', '12:30:00', 'gripe', '2 acetaminofen y piola', null, null, 1, null, null, 1);
-go
-INSERT INTO Especies values ('Conejo'),('Perro'), ('Gato'), ('Hamster');
-GO
-INSERT INTO Razas values('Bulldog', 2),('Beagle', 2),('Esfinge', 3),('Caracal', 3);
-GO
-INSERT INTO Razas (Nombre) values('No definido');
-GO
-INSERT INTO Generos VALUES ('Macho'),('Hembra'),('No identificado');
-GO
-INSERT INTO Estados VALUES ('Sano'),('Enfermo'),('Recuperacion');
-GO
-INSERT INTO Mascotas values('Eduardo', 'gris con negro', '2022-08-09', 0, 0, '8.8', '27', 3, 4, 1, 1);
-GO
-INSERT INTO Personas (Primer_Nombre, Primer_Apellido, DNI, FechaNac) VALUES ('Kelin', 'Aguilar', '0801198400000', '2002-03-08');
-INSERT INTO Responsables_Mascotas values (2,9);
-INSERT INTO Farmacias values(NULL);
-INSERT INTO Formas_Farmaceuticas values ('Jarabe'),('Pastilla'),('Vacuna');
-INSERT INTO Productos values ('NOBIVAC', '2023-08-09', 150.50, 3, 1);
-INSERT INTO Productos values ('COVID', '2023-08-09', 150.50, 3, 1);
-INSERT INTO Carnet_Vacunas VALUES(GETDATE(), 1, NULL);
-INSERT INTO Vacunas_Aplicadas values (1, 1, GETDATE());
-INSERT INTO Enfermedades values('Alergia');
-INSERT INTO Enfermedades_Bases values (1, 1);
-
-
---INSERTS
 --EMPRESA
 INSERT INTO Empresas VALUES ('08012023000001', 'Veterinaria Los Ingenieros', 'losinges@gmail.com', 'ingesvet@gmail.com', 'logo.png'); 
+GO
 
 --Sucursales
 INSERT INTO Estados_Sucursal VALUES ('Abierto'), ('Cerrado'),  ('En mantenimiento');
+GO
 
 --RRHH INSERTS
 INSERT INTO Departamentos (Nombre)
 VALUES
-  ('Cort�s'),
-  ('Islas de la Bah�a'),
-  ('Atl�ntida'),
+  ('Cortés'),
+  ('Islas de la Bahía'),
+  ('Atlántida'),
   ('Distrito Central');
 GO
 
 INSERT INTO Ciudades (Nombre, Id_Departamento)
 VALUES
   ('San Pedro Sula', 1),
-  ('Roat�n', 2),
+  ('Roatán', 2),
   ('La Ceiba', 3),
   ('Tegucigalpa', 4);
 GO
@@ -568,26 +539,56 @@ GO
 
 INSERT INTO Periodos_Laborales VALUES ('Fin de Semana'), ('De Lunes a Viernes');
 
+--SAR
+INSERT INTO Tipo_Documentos VALUES ('Factura', '01'), ('Boleta de Venta', '02'), ('Recibo de Alquiler', '03'), ('Recibo por Honorarios', '04'), ('Nota de Crédito', '05'), ('Nota de Débito', '06'), ('Comprobante de Retencion', '07'), ('Boleta de Compra', '08');
+GO
 
-INSERT INTO Contratos (Fecha_Inicio, Fecha_Final, Id_Periodo_Laboral, Id_Horario, Id_Tipo, Id_Salario) VALUES
-						(GETDATE(), '2024-06-01', 1, 1, 8, 11),
-						(GETDATE(), '2024-04-01', 1, 2, 1, 10)
+--FARMACIAS
+INSERT INTO Farmacias VALUES ('001'), ('002'), ('003'), ('004');
+GO
 
-						
-INSERT INTO Contratos (Fecha_Inicio, Fecha_Final, Id_Periodo_Laboral, Id_Horario, Id_Tipo, Id_Salario) VALUES
-						(GETDATE(), '2024-06-01', 1, 1, 8, 1),
-						(GETDATE(), '2024-04-01', 1, 2, 1, 2)
+--SUCURSALES
+INSERT INTO Sucursales VALUES ('001', 'Sucursal 1', 'losinges01@gmail.com', 1, 1, 1, 1),
+							  ('002', 'Sucursal 2', 'losinges02@gmail.com', 1, 2, 1, 2),
+							  ('003', 'Sucursal 3', 'losinges03@gmail.com', 1, 3, 1, 3),
+							  ('004', 'Sucursal 4', 'losinges04@gmail.com', 1, 4, 1, 4);
+GO
 
-INSERT INTO Contratos_Deducciones (Id_Contrato, Id_Deduccion) VALUES
-						(8, 2),
-						(9, 1)
 
-INSERT INTO Contratos_Deducciones (Id_Contrato, Id_Deduccion) VALUES
-						(9, 2)
+--INSCRIPCION SAR
+INSERT INTO Inscripcion_SAR VALUES ('123DFA-ABC5BC-ABC123-FD12AB-ABC567-12', '2024-12-31', 1, 1500, 0, 1, 1, 1);
+GO
+INSERT INTO Inscripcion_SAR VALUES ('123DFB-ABC5BC-ABC123-FD12AB-ABC567-12', '2024-12-31', 1, 1500, 0, 1, 2, 1);
+GO
+INSERT INTO Inscripcion_SAR VALUES ('123DFC-ABC5BC-ABC123-FD12AB-ABC567-12', '2024-12-31', 1, 1500, 0, 1, 3, 1);
+GO
+INSERT INTO Inscripcion_SAR VALUES ('123DFD-ABC5BC-ABC123-FD12AB-ABC567-12', '2024-12-31', 1, 1500, 0, 1, 4, 1);
+GO
 
-INSERT INTO Direcciones VALUES ('Por Metropoli', 2);
+--PUNTOS EMISION
+INSERT INTO Punto_Emision VALUES ('001', 0, 1), ('002', 0, 1), ('001', 0, 2), ('002', 0, 2), ('001', 0, 3), ('002', 0, 3), ('001', 0, 4), ('002', 0, 4);
+GO
 
-INSERT INTO Sucursales VALUES ('0987', 'Los Ingenieros', 'losinges@gmail.com', 1, 2, 1, 1);
+--MASCOTAS INSERTS
+INSERT INTO Expedientes VALUES (GETDATE(), 1);
+INSERT INTO Consultas values('2023-08-09', '12:30:00', 'gripe', '2 acetaminofen y piola', null, null, 1, null, null, 1);
+go
+INSERT INTO Especies values ('Conejo'),('Perro'), ('Gato'), ('Hamster');
+GO
+INSERT INTO Razas values('Bulldog', 2),('Beagle', 2),('Esfinge', 3),('Caracal', 3);
+GO
+INSERT INTO Razas (Nombre) values('No definido');
+GO
+INSERT INTO Generos VALUES ('Macho'),('Hembra'),('No identificado');
+GO
+INSERT INTO Estados VALUES ('Sano'),('Enfermo'),('Recuperacion');
+GO
+
+INSERT INTO Personas (Primer_Nombre, Primer_Apellido, DNI, FechaNac) VALUES ('Kelin', 'Aguilar', '0801198400000', '2002-03-08');
+INSERT INTO Formas_Farmaceuticas values ('Jarabe'),('Pastilla'),('Vacuna');
+INSERT INTO Productos values ('NOBIVAC', '2023-08-09', 150.50, 3, 1);
+INSERT INTO Productos values ('COVID', '2023-08-09', 150.50, 3, 1);
+INSERT INTO Enfermedades values('Alergia'),('parvovirosis'),('moquillo');
 
 
 --TRIGGERS
@@ -665,3 +666,141 @@ CREATE PROCEDURE precioProducto
 AS 
 UPDATE Productos SET Precio =@precio
 WHERE Id = @Id_Producto 
+
+
+/*Desde donde trabaje Harold*/
+/*Tablas que faltabas para crear las citas*/
+CREATE TABLE Tipo_Estados(
+Id INT PRIMARY KEY IDENTITY(1,1),
+Nombre VARCHAR(50) UNIQUE NOT NULL
+);
+GO
+
+
+
+CREATE TABLE Estados_Citas(
+Id INT PRIMARY KEY IDENTITY(1,1),
+FechaInicio VARCHAR(19) CHECK (FechaInicio LIKE '[0-9][0-9][0-9][0-9]/[0-1][0-9]/[0-3][0-9] [0-2][0-9]:[0-5][0-9]:[0-5][0-9]') NOT NULL,
+FechaFinal VARCHAR(19) CHECK (FechaFinal LIKE '[0-9][0-9][0-9][0-9]/[0-1][0-9]/[0-3][0-9] [0-2][0-9]:[0-5][0-9]:[0-5][0-9]') NOT NULL,
+Id_Cita INT REFERENCES Citas(Id),
+Id_Tipo_Estado INT REFERENCES Tipo_Estados(Id)
+);
+GO
+
+INSERT INTO Tipo_Estados VALUES
+('Pendiente'),
+('Confirmada'),
+('Cancelada'),
+('Realizada'),
+('Reprogramada')
+GO
+
+
+/*Select para obtener el nombre del empleado*/
+select Personas.Primer_Nombre as Nombre from Personas
+INNER JOIN Empleados
+ON Personas.Id = Empleados.Id_Persona
+GO
+
+select Empleados.id as ID from Empleados
+Inner Join Personas
+on Empleados.Id_Persona = Personas.Id
+GO
+
+
+
+/*Select para mostrar en el datGreedView las Citas*/
+CREATE PROCEDURE ObtenerDatosCitas
+AS
+BEGIN
+    SELECT
+        est.Id AS 'ID',
+        pe.Primer_Nombre AS 'Nombre del Empleado',
+		ci.Fecha,
+        ma.Nombre AS 'Nombre de la Mascota',
+        ti.Nombre AS 'Estado',
+        est.FechaInicio AS 'Fecha Inicial del Estado',
+        est.FechaFinal AS 'Fecha Final del Estado'
+    FROM
+        Estados_Citas est
+    INNER JOIN Tipo_estados ti ON est.Id_Tipo_Estado = ti.Id
+    INNER JOIN Citas ci ON ci.Id = est.Id_Cita
+    INNER JOIN Mascotas ma ON ma.Id = ci.Id_Mascota
+    INNER JOIN Empleados em ON em.Id = ci.Id_Empleado
+    INNER JOIN Personas pe ON pe.Id = em.Id_Persona
+END;
+GO
+
+EXEC ObtenerDatosCitas;
+GO
+
+select * from Tipo_Estados;
+select * from Citas;
+Select * from Estados_Citas;
+GO
+
+
+/*Inserts de los roles de los usuarios*/
+insert into Roles Values ('Administrador');
+insert into Roles Values ('Usuario Normal');
+
+/*Tabla modificada de Usuarios*/
+CREATE TABLE Usuarios(
+Id INT PRIMARY KEY IDENTITY(1,1),
+Usuario VARCHAR(25) UNIQUE NOT NULL,
+Contrasenia VARCHAR(50) NOT NULL,
+Activo BIT DEFAULT 0,
+Id_Empleado INT REFERENCES Empleados(Id),
+Id_Roles INT REFERENCES Roles(Id)
+);
+GO
+
+/*Procedimiento almacenado para ver los datos de los usuarios*/
+CREATE PROCEDURE ObtenerDatosUsuarios
+AS
+BEGIN
+	SELECT 
+		us.Id, us.Usuario, 
+		us.Contrasenia 'Contraseña', 
+		us.Activo, ro.Nombre as 'Rol del Usuario', 
+		pe.DNI as 'DNI de la persona',
+		pe.Primer_Nombre + ' '+ pe.Primer_Apellido as 'Nombre del Empleado'
+	FROM 
+		Usuarios us
+	INNER JOIN Roles ro ON ro.Id = us.Id_Roles
+	INNER JOIN Empleados em ON em.Id = us.Id_Empleado
+	INNER JOIN Personas pe ON pe.Id = em.Id_Persona
+END;
+
+EXEC ObtenerDatosUsuarios;
+
+
+/*Select para obtener el dni*/
+SELECT em.Id FROM Empleados em
+INNER JOIN Personas pe
+ON pe.Id = em.Id_Persona
+where pe.DNI = pe.DNI;
+
+SELECT * FROM Personas;
+select * from Sucursales;
+
+CREATE TABLE Empleados(
+Id INT PRIMARY KEY IDENTITY(1,1),
+Num_Seguro VARCHAR(20) UNIQUE,
+Img VARCHAR(50),
+Id_Persona INT REFERENCES Personas(Id),
+Id_Contrato INT REFERENCES Contratos(Id) UNIQUE NOT NULL,
+Id_Sucursal INT REFERENCES Sucursales(Id) NOT NULL
+);
+
+insert into Contratos values (GETDATE(), '2024-08-08', null, null, 1, null);
+
+insert into Empleados values ('123', 'img', 1,1, 1);
+
+SELECT * FROM Consultas;
+insert INTO Consultas values ('2020-02-02', '12:00:00', 'aa', 'aa', null, 1, 1, 4, 2);
+
+select * from Responsables_Mascotas;
+
+SELECT Id FROM Responsables_Mascotas where Id_Persona = 1 AND Id_Mascota = 2;
+select * from Responsables_Mascotas;
