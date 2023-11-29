@@ -688,7 +688,7 @@ WHERE Id = @Id_Producto
 
 BEGIN TRY	
 	BEGIN TRAN 
-	INSERT INTO Farmacias(x) 
+	INSERT INTO Farmacias(codigo) 
 	VALUES (NULL); 
 	DECLARE @Id_Farmacia AS INT SET @Id_Farmacia = (SELECT IDENT_CURRENT('Farmacias') AS Id);
 	
