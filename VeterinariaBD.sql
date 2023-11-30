@@ -407,9 +407,10 @@ GO
 
 CREATE TABLE Puntos_Emision(
 Id INT PRIMARY KEY IDENTITY(1,1),
-Codigo VARCHAR(20) UNIQUE NOT NULL,
+Codigo VARCHAR(20) NOT NULL,
 Id_Ultima_Factura_Emitida INT NOT NULL,
-Id_Sucursal INT REFERENCES Sucursales(Id)
+Id_Sucursal INT REFERENCES Sucursales(Id),
+CONSTRAINT UQ_Punto_Emision UNIQUE (Codigo, Id_Sucursal)
 );
 GO
 
