@@ -408,7 +408,6 @@ GO
 CREATE TABLE Puntos_Emision(
 Id INT PRIMARY KEY IDENTITY(1,1),
 Codigo VARCHAR(20) NOT NULL,
-Id_Ultima_Factura_Emitida INT NOT NULL,
 Id_Sucursal INT REFERENCES Sucursales(Id),
 CONSTRAINT UQ_Punto_Emision UNIQUE (Codigo, Id_Sucursal)
 );
@@ -438,7 +437,8 @@ Impuesto_18 DECIMAL(10,2),
 Id_Inscripcion INT REFERENCES Inscripcion_SAR(Id),
 Id_Scursal INT REFERENCES Sucursales(Id) NOT NULL,
 Id_Cliente INT REFERENCES Responsables_Mascotas(Id) NOT NULL,
-Id_Tipo_Documento INT REFERENCES Tipo_Documentos(Id) NOT NULL
+Id_Tipo_Documento INT REFERENCES Tipo_Documentos(Id) NOT NULL,
+Id_Punto_Emision INT REFERENCES Puntos_Esmision(Id) NOT NULL
 ); 
 GO
 
@@ -579,28 +579,6 @@ GO
 INSERT INTO Puntos_Emision VALUES ('001', 0, 1), ('002', 0, 1), ('001', 0, 2), ('002', 0, 2), ('001', 0, 3), ('002', 0, 3), ('001', 0, 4), ('002', 0, 4);
 GO
 
-
-
-INSERT INTO Contratos (Fecha_Inicio, Fecha_Final, Id_Periodo_Laboral, Id_Horario, Id_Tipo, Id_Salario) VALUES
-						(GETDATE(), '2024-06-01', 1, 1, 8, 11),
-						(GETDATE(), '2024-04-01', 1, 2, 1, 10)
-
-						
-INSERT INTO Contratos (Fecha_Inicio, Fecha_Final, Id_Periodo_Laboral, Id_Horario, Id_Tipo, Id_Salario) VALUES
-						(GETDATE(), '2024-06-01', 1, 1, 8, 1),
-						(GETDATE(), '2024-04-01', 1, 2, 1, 2)
-
-INSERT INTO Contratos_Deducciones (Id_Contrato, Id_Deduccion) VALUES
-						(8, 2),
-						(9, 1)
-
-INSERT INTO Contratos_Deducciones (Id_Contrato, Id_Deduccion) VALUES
-						(9, 2)
-
-INSERT INTO Direcciones VALUES ('Por Metropoli', 2);
-
-INSERT INTO Sucursales VALUES ('0987', 'Los Ingenieros', 'losinges@gmail.com', 1, 2, 1, 1);
-
 INSERT INTO Enfermedades values('Alergia');
 GO
 
@@ -631,6 +609,62 @@ insert into Roles Values ('Administrador');
 insert into Roles Values ('Usuario Normal');
 GO
 
+--PERSONAS
+INSERT INTO Personas VALUES 
+('Harold', 'Steven', 'Vasquez', 'Mairena','0801200234567','2022-03-09', 1),
+('Kattherine', 'Mayely', 'Hernandez', 'Sambula','0501200216500','2002-09-09', 2);
+GO
+
+--SALARIOS
+INSERT INTO Salarios (Salario_Bruto, Id_Periodo_Pago) VALUES (15000.00, 1);
+GO
+
+INSERT INTO Salarios (Salario_Bruto, Id_Periodo_Pago) VALUES (16000.00, 2);
+GO
+
+--Contratos
+INSERT INTO Contratos VALUES (GETDATE(), '2030-12-09', 1, 1, 5, 1), (GETDATE(), '2030-12-31', 2, 2, 6, 2);
+GO
+
+--EMPLEADOS
+INSERT INTO Empleados VALUES ('1234', 'perfilHarold', 1, 1, 1), ('5678', 'perfilKatt',2, 2, 2);
+GO
+
+--USUARIOS
+INSERT INTO Usuarios VALUES ('harold', 'h1234', 1, 1, 1), ('katt', 'k1234', 1, 2, 2);
+GO
+
+--USUARIOS Permisos
+INSERT INTO Usuarios_Permisos VALUES (1, 1), (2, 4);
+GO
+
+--ESPECIES
+INSERT INTO Especies VALUES ('Perro'), ('Gato');
+GO
+
+--RAZAS
+INSERT INTO Razas VALUES ('Aguacatero',1), ('Buldog',1);
+GO
+
+--GENEROS
+INSERT INTO  Generos VALUES ('Macho'),('Hembra'),('No identificado');
+GO
+
+--ESTADOS
+INSERT INTO Estados VALUES ('Enfermo'), ('Muerto'), ('En recuperación'), ('Internado');
+GO
+
+--MASCOTAS
+INSERT INTO Mascotas VALUES 
+('Ranger', 'Mancha roja', '2022-03-04', 1, 0, 12, 10, 1, 1, 1, 1), 
+('Oso', 'Oreja cortada', '2021-03-04', 1, 0, 12, 10, 1, 1, 1, 1);
+GO
+
+--RESPONSABLES
+INSERT INTO Responsables_Mascotas VALUES 
+(1, 1),
+(2, 2);
+GO
 --TRIGGERS
 CREATE TRIGGER GenerarNumeroFactura 
 ON Facturas
