@@ -615,7 +615,7 @@ INSERT INTO Tipo_Estados VALUES
 GO
 
 insert into Permisos Values
-('Todos')
+('Todos'),
 ('Informacion de la Empresa'),
 ('Sucursales'),
 ('Recursos Humanos'),
