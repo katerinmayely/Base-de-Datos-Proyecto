@@ -408,6 +408,7 @@ GO
 CREATE TABLE Puntos_Emision(
 Id INT PRIMARY KEY IDENTITY(1,1),
 Codigo VARCHAR(20) UNIQUE NOT NULL,
+Id_Ultima_Factura_Emitida INT NOT NULL,
 Id_Sucursal INT REFERENCES Sucursales(Id)
 );
 GO
@@ -546,6 +547,37 @@ INSERT INTO Periodos_Pago (Periodo) VALUES
 GO
 
 INSERT INTO Periodos_Laborales VALUES ('Fin de Semana'), ('De Lunes a Viernes');
+
+--SAR
+INSERT INTO Tipo_Documentos VALUES ('Factura', '01'), ('Boleta de Venta', '02'), ('Recibo de Alquiler', '03'), ('Recibo por Honorarios', '04'), ('Nota de Crédito', '05'), ('Nota de Débito', '06'), ('Comprobante de Retencion', '07'), ('Boleta de Compra', '08');
+GO
+
+--FARMACIAS
+INSERT INTO Farmacias VALUES ('001'), ('002'), ('003'), ('004');
+GO
+
+--SUCURSALES
+INSERT INTO Sucursales VALUES ('001', 'Sucursal 1', 'losinges01@gmail.com', 1, 1, 1, 1),
+							  ('002', 'Sucursal 2', 'losinges02@gmail.com', 1, 2, 1, 2),
+							  ('003', 'Sucursal 3', 'losinges03@gmail.com', 1, 3, 1, 3),
+							  ('004', 'Sucursal 4', 'losinges04@gmail.com', 1, 4, 1, 4);
+GO
+
+
+--INSCRIPCION SAR
+INSERT INTO Inscripcion_SAR VALUES ('123DFA-ABC5BC-ABC123-FD12AB-ABC567-12', '2024-12-31', 1, 1500, 0, 1, 1, 1);
+GO
+INSERT INTO Inscripcion_SAR VALUES ('123DFB-ABC5BC-ABC123-FD12AB-ABC567-12', '2024-12-31', 1, 1500, 0, 1, 2, 1);
+GO
+INSERT INTO Inscripcion_SAR VALUES ('123DFC-ABC5BC-ABC123-FD12AB-ABC567-12', '2024-12-31', 1, 1500, 0, 1, 3, 1);
+GO
+INSERT INTO Inscripcion_SAR VALUES ('123DFD-ABC5BC-ABC123-FD12AB-ABC567-12', '2024-12-31', 1, 1500, 0, 1, 4, 1);
+GO
+
+--PUNTOS EMISION
+INSERT INTO Puntos_Emision VALUES ('001', 0, 1), ('002', 0, 1), ('001', 0, 2), ('002', 0, 2), ('001', 0, 3), ('002', 0, 3), ('001', 0, 4), ('002', 0, 4);
+GO
+
 
 
 INSERT INTO Contratos (Fecha_Inicio, Fecha_Final, Id_Periodo_Laboral, Id_Horario, Id_Tipo, Id_Salario) VALUES
