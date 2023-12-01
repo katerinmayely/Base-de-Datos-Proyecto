@@ -688,46 +688,33 @@ CREATE TRIGGER GenerarNumeroFactura
 ON Facturas
 AFTER INSERT AS
 BEGIN 
-	DECLARE @Id_Sucursal AS INT = (SELECT Id_Scursal FROM inserted);
-
-	--Obtengo el numero correlativo de factura actual
-	DECLARE @Num_Actual AS INT = (SELECT Num_Actual 
-								  FROM Inscripcion_SAR 
-								  WHERE Id_Sucursal = @Id_Sucursal AND Activo = 1);
-	
-	--Numero correlativo de la nueva factura
+	-- Actualizar el número correlativo para cada fila insertada
 	UPDATE Inscripcion_SAR 
-	SET Activo = @Num_Actual + 1
-	WHERE Id_Sucursal = @Id_Sucursal AND Activo = 1
+	SET Num_Actual += 1
+	WHERE Id_Sucursal IN (SELECT Id_Scursal FROM inserted) AND Activo = 1;
 
-	--Obtengo el correlativo de la nueva factura
-	DECLARE @Nuevo_Correlativo AS INT = (SELECT Num_Actual 
-								  FROM Inscripcion_SAR 
-								  WHERE Id_Sucursal = @Id_Sucursal AND Activo = 1);
-
-	DECLARE @Id_Factura_Ingresada AS INT = (SELECT Id FROM inserted)
-
-	DECLARE @Punto_Emision AS VARCHAR(3) = (SELECT Puntos_Emision.Codigo
-											FROM (Puntos_Emision JOIN Sucursales ON Puntos_Emision.Id_Sucursal = @Id_Sucursal)
-											WHERE Puntos_Emision.Id_Ultima_Factura_Ingresada = @Id_Factura_Ingresada)
-	DECLARE @Codigo_Sucursal AS VARCHAR(3) = (SELECT Sucursales.Codigo 
-											  FROM Sucursales 
-											  WHERE Id = @Id_Sucursal)
-	DECLARE @Tipo_Documento AS VARCHAR(2) = (SELECT Tipo_Documentos.Codigo 
-										     FROM (Tipo_Documentos INNER JOIN Facturas ON Tipo_Documentos.Id = Facturas.Id_Tipo_Documento)
-											 WHERE Facturas.Id = @Id_Factura_Ingresada)
-
-	DECLARE @Nuevo_Correlativo_Formateado VARCHAR(8);
-	SET @Nuevo_Correlativo_Formateado = FORMAT(@Nuevo_Correlativo, '00000000');
-
-	DECLARE @Numero_Factura AS VARCHAR(19) = @Codigo_Sucursal + '-' + @Punto_Emision + '-' + @Tipo_Documento + '-' + @Nuevo_Correlativo_Formateado;
-
+	-- Obtener el correlativo para cada fila insertada
 	UPDATE Facturas
-    SET Num_Factura = @Numero_Factura
-    FROM Facturas INNER JOIN inserted ON Facturas.Id = inserted.Id;
+	SET Num_Factura = CONCAT(
+        (SELECT TOP 1 Codigo FROM Sucursales WHERE Id = Facturas.Id_Scursal),
+        '-',
+        (SELECT TOP 1 Puntos_Emision.Codigo
+         FROM Puntos_Emision
+         INNER JOIN Facturas ON Puntos_Emision.Id = Facturas.Id_Punto_Emision
+         WHERE Facturas.Id = inserted.Id),  -- Usamos "inserted.Id" para referenciar la columna Id de la fila recién insertada
+        '-',
+        (SELECT TOP 1 Tipo_Documentos.Codigo
+         FROM Tipo_Documentos
+         INNER JOIN Facturas ON Tipo_Documentos.Id = Facturas.Id_Tipo_Documento
+         WHERE Facturas.Id = inserted.Id),  -- Usamos "inserted.Id" para referenciar la columna Id de la fila recién insertada
+        '-',
+        FORMAT((SELECT TOP 1 Num_Actual FROM Inscripcion_SAR WHERE Id_Sucursal = Facturas.Id_Scursal AND Activo = 1), '00000000')
+    )
+    FROM Facturas
+    INNER JOIN inserted ON Facturas.Id = inserted.Id;
 END
 GO
-
+	
 CREATE TRIGGER SetSalarioNeto
 ON Salarios
 AFTER INSERT
