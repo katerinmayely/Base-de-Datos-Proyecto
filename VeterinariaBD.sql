@@ -720,7 +720,7 @@ BEGIN
 END
 GO
 
-ALTER PROCEDURE verificarSAR
+CREATE PROCEDURE verificarSAR
 @Id_Sucursal INT
 AS
 BEGIN
@@ -758,6 +758,7 @@ BEGIN
 	SELECT @Disponible AS Disponible;
 
 END
+GO
 	
 CREATE TRIGGER SetSalarioNeto
 ON Salarios
