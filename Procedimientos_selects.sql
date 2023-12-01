@@ -33,8 +33,10 @@ BEGIN
     INNER JOIN Empleados em ON em.Id = ci.Id_Empleado
     INNER JOIN Personas pe ON pe.Id = em.Id_Persona
 END;
+GO
 
 EXEC ObtenerDatosCitas;
+GO
 
 /*Procedimiento almacenado para ver los datos de los usuarios*/
 CREATE PROCEDURE ObtenerDatosUsuarios
@@ -42,7 +44,7 @@ AS
 BEGIN
 	SELECT 
 		us.Id, us.Usuario, 
-		us.Contrasenia 'Contraseña', 
+		us.Contrasenia as 'Contraseña', 
 		us.Activo, ro.Nombre as 'Rol del Usuario', 
 		pe.DNI as 'DNI de la persona',
 		pe.Primer_Nombre + ' '+ pe.Primer_Apellido as 'Nombre del Empleado'
