@@ -659,11 +659,28 @@ INSERT INTO Mascotas VALUES
 ('Ranger', 'Mancha roja', '2022-03-04', 1, 0, 12, 10, 1, 1, 1, 1), 
 ('Oso', 'Oreja cortada', '2021-03-04', 1, 0, 12, 10, 1, 1, 1, 1);
 GO
-
+--TIPOS DE REGISTROS
+INSERT INTO Tipos_Registros VALUES 
+('Compra', 1),
+('Dev Compra', -1),
+('Venta ', -1),
+('Dev Venta', 1),
+('Registro', 1);
+GO
 --RESPONSABLES
 INSERT INTO Responsables_Mascotas VALUES 
 (1, 1),
 (2, 2);
+GO
+--FORMA FARMACEUTICA 
+INSERT INTO Formas_Farmaceuticas VALUES 
+('Comprimido'),
+('Capsula'),
+('Jarabe'),
+('Inyectable'),
+('Crema'),
+('Gotas'),
+('Aerosol');
 GO
 --TRIGGERS
 CREATE TRIGGER GenerarNumeroFactura 
