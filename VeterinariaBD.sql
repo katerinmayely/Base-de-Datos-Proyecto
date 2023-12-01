@@ -683,6 +683,10 @@ INSERT INTO Formas_Farmaceuticas VALUES
 ('Gotas'),
 ('Aerosol');
 GO
+
+--PRODUCTOS
+INSERT INTO Productos VALUES ('Consulta', '', 150.00, NULL, 1), ('Pastilla', '2024-03-09', 50.00, 2,2), ('Jarabe', '2024-03-09', 100.00, 3,2);
+GO
 --TRIGGERS
 CREATE TRIGGER GenerarNumeroFactura 
 ON Facturas
