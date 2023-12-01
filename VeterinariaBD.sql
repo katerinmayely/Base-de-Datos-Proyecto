@@ -438,7 +438,7 @@ Id_Inscripcion INT REFERENCES Inscripcion_SAR(Id),
 Id_Scursal INT REFERENCES Sucursales(Id) NOT NULL,
 Id_Cliente INT REFERENCES Responsables_Mascotas(Id) NOT NULL,
 Id_Tipo_Documento INT REFERENCES Tipo_Documentos(Id) NOT NULL,
-Id_Punto_Emision INT REFERENCES Puntos_Esmision(Id) NOT NULL
+Id_Punto_Emision INT REFERENCES Puntos_Emision(Id) NOT NULL
 ); 
 GO
 
@@ -452,6 +452,7 @@ GO
 
 CREATE TABLE Detalles_Facturas(
 Id INT PRIMARY KEY IDENTITY(1,1),
+Precio INT NOT NULL,
 Cantidad INT NOT NULL,
 Impuesto_15 DECIMAL(10,2),
 Impuesto_18 DECIMAL(10,2),
