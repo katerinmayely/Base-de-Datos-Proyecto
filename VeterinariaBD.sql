@@ -687,7 +687,8 @@ GO
 --PRODUCTOS
 INSERT INTO Productos VALUES ('Consulta', '', 150.00, NULL, 1), ('Pastilla', '2024-03-09', 50.00, 2,2), ('Jarabe', '2024-03-09', 100.00, 3,2);
 GO
---TRIGGERS
+	
+--TRIGGERS Y SP
 CREATE TRIGGER GenerarNumeroFactura 
 ON Facturas
 AFTER INSERT AS
@@ -718,6 +719,45 @@ BEGIN
     INNER JOIN inserted ON Facturas.Id = inserted.Id;
 END
 GO
+
+ALTER PROCEDURE verificarSAR
+@Id_Sucursal INT
+AS
+BEGIN
+	DECLARE @Disponible INT;
+	DECLARE @Activo INT;
+	DECLARE @Final INT;
+	DECLARE @Actual INT;
+
+	SELECT @Activo = Activo
+	FROM Inscripcion_SAR 
+	WHERE Id_Sucursal = @Id_Sucursal AND Activo = 1;
+
+	SELECT @Final = Final_Rango
+	FROM Inscripcion_SAR 
+	WHERE Id_Sucursal = @Id_Sucursal AND Activo = 1;
+
+	SELECT @Actual = Num_Actual
+	FROM Inscripcion_SAR 
+	WHERE Id_Sucursal = @Id_Sucursal AND Activo = 1;
+
+	SET @Disponible = CASE
+						WHEN @Final > @Actual THEN 1
+						ELSE 0
+					 END;
+
+	--ACtualizacion del correlativo actual
+	IF @Activo = 1 AND @Disponible = 0
+	BEGIN
+		UPDATE Inscripcion_SAR 
+		SET Activo = 0
+		WHERE Id_Sucursal = @Id_Sucursal;
+	END
+
+	-- Devolver el resultado
+	SELECT @Disponible AS Disponible;
+
+END
 	
 CREATE TRIGGER SetSalarioNeto
 ON Salarios
