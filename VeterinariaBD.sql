@@ -577,7 +577,7 @@ INSERT INTO Inscripcion_SAR VALUES ('123DFD-ABC5BC-ABC123-FD12AB-ABC567-12', '20
 GO
 
 --PUNTOS EMISION
-INSERT INTO Puntos_Emision VALUES ('001', 0, 1), ('002', 0, 1), ('001', 0, 2), ('002', 0, 2), ('001', 0, 3), ('002', 0, 3), ('001', 0, 4), ('002', 0, 4);
+INSERT INTO Puntos_Emision VALUES ('001', 1), ('002', 1), ('001', 2), ('002', 2), ('001', 3), ('002', 3), ('001', 4), ('002', 4);
 GO
 
 INSERT INTO Enfermedades values('Alergia');
