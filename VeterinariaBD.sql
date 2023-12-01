@@ -662,10 +662,10 @@ GO
 --TIPOS DE REGISTROS
 INSERT INTO Tipos_Registros VALUES 
 ('Compra', 1),
-('Dev Compra', -1),
-('Venta ', -1),
+('Venta', -1),
+('Dev Compra ', -1),
 ('Dev Venta', 1),
-('Registro', 1);
+('Registro', 0);
 GO
 --RESPONSABLES
 INSERT INTO Responsables_Mascotas VALUES 
