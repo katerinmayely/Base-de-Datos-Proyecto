@@ -857,3 +857,29 @@ BEGIN CATCH
 	ROLLBACK 
 	PRINT('NO SE INSERTO LA SUCURSAL'); 
 END CATCH
+
+
+
+/*INSERTS*/
+insert into Telefonos_Sucursales VALUES 
+('96410183', 1),
+('33121518',1)
+; 
+GO
+
+INSERT INTO Correos_Personas VALUES 
+('haroldvasquez@gmail.com',1),
+('katymartinez@gmail.com',2);
+GO
+
+INSERT INTO Telefonos_Personas VALUES 
+('33123345',1),
+('96314880',1),
+('89154568',2);
+GO
+
+
+
+
+
+
